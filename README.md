@@ -5,7 +5,7 @@ Examples for DL4J using Clojure. For experimentation only.
 ## Word2Vec example using REPL
 
 Example usage after cloning:
-[![asciicast](https://asciinema.org/a/7xn2860hls1s639wmiktpiehw.png)](https://asciinema.org/a/7xn2860hls1s639wmiktpiehw)
+[![asciicast](https://asciinema.org/a/1b8anqb29r3a280zer88k9p1m.png)](https://asciinema.org/a/1b8anqb29r3a280zer88k9p1m)
 
 ## License
 
