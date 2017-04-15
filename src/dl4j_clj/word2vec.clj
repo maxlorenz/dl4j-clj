@@ -1,4 +1,4 @@
-(ns dl4j-clj.core
+(ns dl4j-clj.word2vec
   (:import (org.deeplearning4j.text.sentenceiterator BasicLineIterator)
            (org.deeplearning4j.text.tokenization.tokenizerfactory DefaultTokenizerFactory)
            (org.deeplearning4j.models.word2vec Word2Vec$Builder)
@@ -15,7 +15,7 @@
     (.setTokenPreProcessor token-factory (CommonPreprocessor.))
     (-> (new Word2Vec$Builder)
       (.minWordFrequency 4)
-      (.iterations 10)
+      (.iterations 500)
       (.layerSize 500)
       (.seed 0)
       (.windowSize 5)
