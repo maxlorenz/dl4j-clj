@@ -17,6 +17,28 @@ Turns words into vectors.
 Example usage after cloning:
 [![asciicast](https://asciinema.org/a/1b8anqb29r3a280zer88k9p1m.png)](https://asciinema.org/a/1b8anqb29r3a280zer88k9p1m)
 
+Usage example:
+
+```clojure
+(def model (create-model "resources/harry_potter.txt"))
+=> #'dl4j-clj.paragraph2vec/model
+(train model)
+=> nil
+(predict model "Harry Hagrid Harry Hagrid")
+=> "LINE_6379"
+
+;;Ron and Hermione squeezed together to give Hagrid enough space to join
+;;them.
+
+;;"Bin watchin' from me hut," said Hagrid, patting a large pair of
+;;binoculars around his neck, "But it isn't the same as bein' in the
+;;crowd. No sign of the Snitch yet, eh?"
+
+;;"Nope," said Ron. "Harry hasn't had much to do yet."
+
+;;"Kept outta trouble, though, that's somethin'," said Hagrid, raising his
+```
+
 ## Paragraph2Vec example using REPL
 
 Used to turn paragraphs into vectors. The sentence _must_ contain
