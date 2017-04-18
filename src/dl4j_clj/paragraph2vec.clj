@@ -33,7 +33,7 @@
 (defn train [model]
   (.fit model))
 
-(defn getVector [model text]
+(defn get-vector [model text]
   (.inferVector model text))
 
 (defn predict [model text]
