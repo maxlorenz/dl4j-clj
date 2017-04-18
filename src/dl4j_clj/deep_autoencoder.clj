@@ -10,7 +10,7 @@
            (org.deeplearning4j.optimize.listeners ScoreIterationListener)
            (org.nd4j.linalg.dataset DataSet)))
 
-(def config
+(def example-config
   {:rows    28
    :columns 28
    :seed    42
@@ -19,43 +19,44 @@
    :iterations 1
    :listener-frequency (/ 1 1)})
 
-(def iter (MnistDataSetIterator. (:batch-size config) (:samples config) true))
 
-(defn create-layer [in out]
+(defn- create-layer [in out]
   (-> (RBM$Builder.)
       (.nIn in)
       (.nOut out)
       (.lossFunction LossFunctions$LossFunction/KL_DIVERGENCE)
       (.build)))
 
+(defn create-iter [config]
+  (MnistDataSetIterator. (:batch-size config) (:samples config) true))
 
-(def conf
+(def iter (create-iter example-config))
+
+(defn create-model [config]
   (let [mnist-res (* (:rows config) (:columns config))]
     (-> (NeuralNetConfiguration$Builder.)
         (.seed (:seed config))
         (.iterations (:iterations config))
         (.optimizationAlgo OptimizationAlgorithm/LINE_GRADIENT_DESCENT)
         (.list)
-        (.layer 0 (create-layer mnist-res 1000))
-        (.layer 1 (create-layer 1000 30))
-        (.layer 2 (create-layer 30 1000))
-        (.layer 3 (->
-                    (OutputLayer$Builder. LossFunctions$LossFunction/MSE)
-                    (.activation Activation/SIGMOID)
-                    (.nIn 1000)
-                    (.nOut mnist-res)
-                    (.build)))
+        (.layer 0 (create-layer mnist-res 100))
+        (.layer 1 (create-layer 100 30))
+        (.layer 2 (create-layer 30 100))
+        (.layer 3 (-> (OutputLayer$Builder. LossFunctions$LossFunction/MSE)
+                      (.activation Activation/SIGMOID)
+                      (.nIn 100)
+                      (.nOut mnist-res)
+                      (.build)))
         (.pretrain true)
         (.backprop true)
-        (.build))))
+        (.build)
+        (MultiLayerNetwork.))))
 
-(def model (MultiLayerNetwork. conf))
-
-(.init model)
-
-(.setListeners model [(ScoreIterationListener. (:listener-frequency config))])
-
-(def data-next (.next iter))
-
-(defn train []
-  (.fit model (DataSet. (.getFeatureMatrix data-next) (.getFeatureMatrix data-next))))
+(defn train [model]
+  (letfn [(train-step [data] (DataSet. (.getFeatureMatrix data) (.getFeatureMatrix data)))]
+    (.init model)
+    (.setListeners model [(ScoreIterationListener. (:listener-frequency 1))])
+    (def data-next (iterator-seq (.next iter)))
+    (doseq [data data-next]
+      (train-step data)
+      (.fit model))))
