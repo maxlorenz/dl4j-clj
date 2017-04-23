@@ -8,10 +8,10 @@
            (org.deeplearning4j.text.documentiterator LabelsSource)
            (org.deeplearning4j.models.paragraphvectors ParagraphVectors$Builder)))
 
-(def example-file (-> "./resources/dl4j_nlp.txt" (File.)))
+(def example-file "./resources/dl4j_nlp.txt")
 
 (defn create-model [file]
-  (let [iter (BasicLineIterator. file)
+  (let [iter (BasicLineIterator. (File. file))
         cache (AbstractCache.)
         token-factory (DefaultTokenizerFactory.)
         source (LabelsSource. "LINE_")]

@@ -8,17 +8,17 @@
 
 (def example-file "resources/harry_potter.txt")
 
-(defn build-model [file-path]
+(defn build-model [file-path min-frequency window-size]
   (let [text-file (-> file-path (File.) (.getAbsolutePath))
         token-factory (DefaultTokenizerFactory.)
         iterator (BasicLineIterator. text-file)]
     (.setTokenPreProcessor token-factory (CommonPreprocessor.))
     (-> (new Word2Vec$Builder)
-      (.minWordFrequency 8)
-      (.iterations 200)
+      (.minWordFrequency min-frequency)
+      (.iterations 100)
       (.layerSize 100)
       (.seed 0)
-      (.windowSize 7)
+      (.windowSize window-size)
       (.iterate iterator)
       (.tokenizerFactory token-factory)
       (.build))))
