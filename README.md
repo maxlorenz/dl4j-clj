@@ -22,8 +22,6 @@ Example usage after cloning:
 Used to turn paragraphs into vectors. The sentence _must_ contain
 a word from the training set, otherwise no vector can be calculated.
 
-TODO: implement automatic clustering
-
 https://asciinema.org/a/
 [![asciicast](https://asciinema.org/a/6m7t6pqf3wp4sbv28o78rd12u.png)](https://asciinema.org/a/6m7t6pqf3wp4sbv28o78rd12u)
 
@@ -47,4 +45,20 @@ Usage example:
 ;;"Nope," said Ron. "Harry hasn't had much to do yet."
 
 ;;"Kept outta trouble, though, that's somethin'," said Hagrid, raising his
+```
+
+## Clustering example using word2vec
+
+Cluster words using word2vec vector representation using k-means.
+
+```clojure
+(->> "./resources/harry_potter.txt"
+     (extract-words)
+     (cluster-words 20 2) ;; 20 clusters, 2 runs
+     (group-words)
+     (map #(take 5 %)))
+
+;; (("year" "weeks" "years" "number" "ever")
+;;  ("fifty" "poor" "eleven" "eating" "strange")
+;;  ...
 ```
