@@ -10,15 +10,15 @@
            (org.deeplearning4j.optimize.listeners ScoreIterationListener)
            (org.nd4j.linalg.dataset DataSet)))
 
-(def example-config
-  {:rows    28
-   :columns 28
-   :seed    42
-   :samples MnistDataFetcher/NUM_EXAMPLES
-   :batch-size 1000
+(def example-model-description
+  {:rows       28
+   :columns    28
    :iterations 1
-   :listener-frequency (/ 1 1)})
+   :seed       0})
 
+(def example-training-description
+  {:samples    MnistDataFetcher/NUM_EXAMPLES
+   :batch-size 10})
 
 (defn- create-layer [in out]
   (-> (RBM$Builder.)
@@ -26,11 +26,6 @@
       (.nOut out)
       (.lossFunction LossFunctions$LossFunction/KL_DIVERGENCE)
       (.build)))
-
-(defn create-iter [config]
-  (MnistDataSetIterator. (:batch-size config) (:samples config) true))
-
-(def iter (create-iter example-config))
 
 (defn create-model [config]
   (let [mnist-res (* (:rows config) (:columns config))]
@@ -52,11 +47,27 @@
         (.build)
         (MultiLayerNetwork.))))
 
-(defn train [model]
-  (letfn [(train-step [data] (DataSet. (.getFeatureMatrix data) (.getFeatureMatrix data)))]
+(defn- create-iter [config]
+  (MnistDataSetIterator. (:batch-size config) (:samples config) true))
+
+(defn train [model config]
+  (letfn [(chunk->dataset [data] (DataSet. (.getFeatureMatrix data) (.getFeatureMatrix data)))]
     (.init model)
-    (.setListeners model [(ScoreIterationListener. (:listener-frequency 1))])
-    (def data-next (iterator-seq (.next iter)))
-    (doseq [data data-next]
-      (train-step data)
-      (.fit model))))
+
+    ;; Print every iteration + score
+    (.setListeners model [(ScoreIterationListener. 0)])
+
+    ;; Limit number of batches for faster feedback
+    (def batches (take 10 (iterator-seq (create-iter config))))
+    (println "Number of iterations: " (count batches))
+
+    ;; Run the training
+    (doseq [chunk batches]
+      (->> chunk
+           (chunk->dataset)
+           (.fit model)))))
+
+(defn create-and-train-demo-model []
+  (def model (create-model example-model-description))
+  (train model example-training-description)
+  model)
